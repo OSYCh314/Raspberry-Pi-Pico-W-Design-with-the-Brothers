@@ -1,8 +1,9 @@
 import time
 import random
 from machine import Pin, PWM
+import dht
 
-button = Pin(12, Pin.IN, Pin.PULL_UP)
+button = Pin(0, Pin.IN, Pin.PULL_UP)
 
 class rgb_led:
   def __init__(self,pin_r,pin_g,pin_b,freq = 1000):
@@ -28,10 +29,32 @@ class rgb_led:
     self.b.duty_u16(b_true)
     
 #Initialisation
-led = rgb_led(0,1,2)
-led1 = Pin(13, Pin.OUT)
+led = rgb_led(12,13,14)
+led2 = rgb_led(11, 10, 9)
+#led1 = Pin(n/a, Pin.OUT)
 buzzer_pin = Pin(15)
 buzzer = PWM(buzzer_pin)
+sensor = dht.DHT11(Pin(16))
+
+def measure():
+    try:
+        # Trigger a sensor measurement
+        sensor.measure()
+        
+        # Read the temperature and humidity values
+        temp = sensor.temperature()    # Returns temperature in Celsius
+        hum = sensor.humidity()        # Returns relative humidity percentage
+        
+        # Print the results to the Shell
+        #print(f"Temperature: {temp}°C | Humidity: {hum}%")
+
+        return temp, hum
+        
+    except OSError as e:
+        # Handle sensor reading failures (e.g., loose wires)
+        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
+
+        return 0, 0
 
 def play_tone(frequency, duration_ms):
     if frequency == 0:
@@ -80,12 +103,54 @@ notes = [
 #    play_tone(NOTES[note], 300)
 #    time.sleep_ms(50)
 
+ledtoggle = True
+
+while True:
+
+    temp, hum = measure()
+
+    if ledtoggle == False:
+       led.show_colour((0,0,0))
+       led2.show_colour((0, 0,0))
+
+    if hum < 54:
+       if ledtoggle:
+        led.show_colour((0, 0, 0))
+        led2.show_colour((50, 50, 50))
+       play_tone(0, 0)
+    elif hum >= 54 and hum <= 57:
+       if ledtoggle:
+        led.show_colour((200, 200, 0)) 
+        led2.show_colour((0, 0, 0))  
+       play_tone(784, 120)
+    elif hum > 57:
+       if ledtoggle:
+        led.show_colour((200, 0, 0))
+        led2.show_colour((0, 0, 0))
+       play_tone(1047, 50)
+
+    print(temp, hum)
+
+    if button.value() == 0:  # Button is pressed (LOW)
+        if ledtoggle == True:
+            ledtoggle = False
+            play_tone(784, 100)   # G5 — turning OFF
+            print("False")
+        elif ledtoggle == False:
+            ledtoggle = True
+            play_tone(880, 100)   # A5 — turning ON
+            print("True")
+    else:                    # Button is not pressed (HIGH)
+        play_tone(0, 0)
+
+'''
 while True:
     if button.value() == 0:  # Button is pressed (LOW)
         led.show_colour((random.randint(0, 255), random.randint(0, 255), random.randint(0, 255) )) 
-        led1.on()  
+        #led1.on()  
         play_tone(262, 150) 
     else:                    # Button is not pressed (HIGH)
         led.show_colour((0,0,0))
-        led1.off()
+        #led1.off()
     time.sleep(0.1)
+'''
