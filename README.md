@@ -1,6 +1,6 @@
 # Raspberry-Pi-Pico-W-Design-with-the-Brothers
 This is some code for a Raspberry Pi Pico W with:
-- an I2C LCD 2x16 Display with backpack
+- an [I2C LCD 2x16 Display](www.jaycar.com.au/alphanumeric-dot-matrix-liquid-crystal-display-module-backlit/p/QP5516) with the corresponding [backpack](https://www.jaycar.com.au/arduino-compatible-lcd-i2c-port-expander-module/p/XC3706?srsltid=AfmBOoqkmIiEVycjD4T-cx-O_hNnfLRz8mOrgLI4cOCULVOfV21zELwt)
 - Temperature and Humidity Sensor (DHT11)
 - At least 1 RGB LED
 - 3 buttons or a buzzer
