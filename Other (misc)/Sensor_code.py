@@ -1,4 +1,5 @@
 from machine import Pin, PWM
+import dht
 from I2C_LCD import screen
 from RGB_LED import rgb_led
 
@@ -23,6 +24,9 @@ def get_colour(bounds,value,inverted = False): #Colour function to read the boun
 #Set up the display
 lcd = screen()
 lcd.start()
+
+#Set up the sensor
+dht_sensor = dht.DHT11(Pin(16,Pin.OUT,Pin.PULL_UP))
 
 #Set up the RGB LEDs
 temp_led = rgb_led(3,4,5)
