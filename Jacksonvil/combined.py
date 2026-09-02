@@ -5,6 +5,8 @@ import dht
 
 button = Pin(0, Pin.IN, Pin.PULL_UP)
 
+test = 0
+
 class rgb_led:
   def __init__(self,pin_r,pin_g,pin_b,freq = 1000):
     self.r = PWM(Pin(pin_r))
