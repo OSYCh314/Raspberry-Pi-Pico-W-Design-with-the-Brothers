@@ -129,7 +129,7 @@ while True:
        if ledtoggle:
         led.show_colour((200, 0, 0))
         led2.show_colour((0, 0, 0))
-       play_tone(1047, 50)
+       play_tone(2000,1000)
 
     print(temp, hum)
 
