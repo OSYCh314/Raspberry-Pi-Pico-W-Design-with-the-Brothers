@@ -1,23 +1,37 @@
-from machine import Pin
+from machine import Pin, PWM
 import dht
 import time
 
 # Initialize the DHT11 sensor
 sensor = dht.DHT11(Pin(15))
+buzzer_pin = Pin(16)
+buzzer = PWM(buzzer_pin)
 
-def measure():
+def measureHum():
+    try:
+        # Trigger a sensor measurement
+        sensor.measure()
+        
+        # Read the temperature and humidity values
+        hum = sensor.humidity()        # Returns relative humidity percentage
+
+        return hum
+        
+    except OSError as e:
+        # Handle sensor reading failures (e.g., loose wires)
+        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
+
+        return e
+
+def measureTemp():
     try:
         # Trigger a sensor measurement
         sensor.measure()
         
         # Read the temperature and humidity values
         temp = sensor.temperature()    # Returns temperature in Celsius
-        hum = sensor.humidity()        # Returns relative humidity percentage
-        
-        # Print the results to the Shell
-        #print(f"Temperature: {temp}°C | Humidity: {hum}%")
 
-        return 'Temp: '+str(temp)+'°C\nHum: '+str(hum)+'%%'
+        return temp
         
     except OSError as e:
         # Handle sensor reading failures (e.g., loose wires)
@@ -110,10 +124,22 @@ class Screen:
         if line2:
             self.display_line(line2, 2)
 
+def play_tone(frequency, duration_ms):
+    if frequency == 0:
+        # Frequency of 0 means silence/rest
+        buzzer.duty_u16(0)
+    else:
+        buzzer.freq(frequency)     # Set the tone pitch
+        buzzer.duty_u16(32768)    # Set volume / 50% duty cycle
+        
+    time.sleep_ms(duration_ms)
+    buzzer.duty_u16(0)
+
 lcd = Screen()
 
 lcd.start()
 
 while True:
-    lcd.display(measure())
+    value = 'Temp: '+str(measureTemp())+' deg C\nHum: '+str(measureHum())+'%'
+    lcd.display(value)
     time.sleep(1)

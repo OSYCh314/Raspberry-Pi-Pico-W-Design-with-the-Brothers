@@ -12,7 +12,7 @@ def play_tone(frequency, duration_ms):
     time.sleep_ms(duration_ms)
     buzzer.duty_u16(0)
 
-buzzer_pin = Pin(15)
+buzzer_pin = Pin(16)
 buzzer = PWM(buzzer_pin)
 
 NOTES = {

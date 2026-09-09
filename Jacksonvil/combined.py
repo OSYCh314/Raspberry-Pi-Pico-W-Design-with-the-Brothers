@@ -34,9 +34,9 @@ class rgb_led:
 led = rgb_led(12,13,14)
 led2 = rgb_led(11, 10, 9)
 #led1 = Pin(n/a, Pin.OUT)
-buzzer_pin = Pin(15)
+buzzer_pin = Pin(16)
 buzzer = PWM(buzzer_pin)
-sensor = dht.DHT11(Pin(16))
+sensor = dht.DHT11(Pin(15))
 
 def measure():
     try:

@@ -1,7 +1,7 @@
 from machine import Pin,PWM
 from time import sleep
 
-buzzer = PWM(Pin(15))
+buzzer = PWM(Pin(16))
 buzzer.freq(1000)
 buzzer.duty_u16(32768)
 
