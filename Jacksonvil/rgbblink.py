@@ -26,7 +26,7 @@ class rgb_led:
     self.b.duty_u16(b_true)
 
 #Initialisation
-led = rgb_led(0,1,2)
+led = rgb_led(18,19,20)
 led1 = Pin(13, Pin.OUT)
 led2 = Pin(11, Pin.OUT)
 

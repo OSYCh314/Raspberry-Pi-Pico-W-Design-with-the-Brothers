@@ -15,13 +15,13 @@ def measureHum():
         # Read the temperature and humidity values
         hum = sensor.humidity()        # Returns relative humidity percentage
 
-        return hum
+        return int(hum)
         
     except OSError as e:
         # Handle sensor reading failures (e.g., loose wires)
         print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
 
-        return e
+        return 0
 
 def measureTemp():
     try:
@@ -31,13 +31,13 @@ def measureTemp():
         # Read the temperature and humidity values
         temp = sensor.temperature()    # Returns temperature in Celsius
 
-        return temp
+        return int(temp)
         
     except OSError as e:
         # Handle sensor reading failures (e.g., loose wires)
         print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
 
-        return e
+        return 0
 
 from machine import Pin, PWM, I2C
 import time
@@ -135,11 +135,92 @@ def play_tone(frequency, duration_ms):
     time.sleep_ms(duration_ms)
     buzzer.duty_u16(0)
 
-lcd = Screen()
+from machine import Pin, PWM
 
+class rgb_led:
+  def __init__(self,pin_r=0,pin_g=1,pin_b=2,freq = 1000):
+    self.r = PWM(Pin(pin_r))
+    self.g = PWM(Pin(pin_g))
+    self.b = PWM(Pin(pin_b))
+
+    self.r.freq(freq)
+    self.g.freq(freq)
+    self.b.freq(freq)
+
+  def show_colour(self,rgb_tuple):
+    #Converts from 0-255 to 65535-0
+    r,g,b = rgb_tuple
+    
+    r_true = r*256
+    self.r.duty_u16(r_true)
+
+    g_true = g*256
+    self.g.duty_u16(g_true)
+
+    b_true = b*256
+    self.b.duty_u16(b_true)
+
+NOTES = {
+    'C5': 523,
+    'E5': 659,
+    'G5': 784
+}
+
+def warningTone():
+    for ii in range(200):
+        play_tone(ii*2 + 500,10)
+
+lcd = Screen()
+light = rgb_led(18,19,20)
 lcd.start()
 
-while True:
-    value = 'Temp: '+str(measureTemp())+' deg C\nHum: '+str(measureHum())+'%'
-    lcd.display(value)
-    time.sleep(1)
+try:
+    while True:
+        tempNow = measureTemp()
+        humNow = measureHum()
+
+        humlow = 55
+        humhigh = 57
+
+        templow = 25
+        temphigh = 30
+
+        if humNow < humlow and tempNow < templow:
+            value = 'Temp:'+str(tempNow)+'C\nHum:'+str(humNow)+'%'
+            light.show_colour((0,255,0))
+        elif humNow >= humlow and humNow <= humhigh and tempNow < templow:
+            value = 'Temp:'+str(tempNow)+'C\nHum:'+str(humNow)+'%' + ' CAUTION'
+            light.show_colour((255,255,0))
+            play_tone(2000, 1000)
+        elif humNow > humhigh and tempNow < templow:
+            value = 'Temp:'+str(tempNow)+'C\nHum:'+str(humNow)+'%' + ' CRITICAL'
+            light.show_colour((255,0,0))
+            warningTone()
+        elif humNow < humlow and tempNow >= templow and tempNow <= temphigh:
+            value = 'Temp:'+str(tempNow)+'C CAUTION\nHum:'+str(humNow)+'%'
+            light.show_colour((255,255,0))
+            play_tone(2000, 1000)
+        elif humNow < humlow and tempNow > temphigh:
+            value = 'Temp:'+str(tempNow)+'C CRITICAL\nHum:'+str(humNow)+'%'
+            light.show_colour((255,0,0))
+            warningTone()
+        elif humNow >= humlow and humNow <= humhigh and tempNow >= templow and tempNow <= temphigh:
+            value = 'Temp:'+str(tempNow)+'C CAUTION\nHum:'+str(humNow)+'%' + ' CAUTION'
+            light.show_colour((255,255,0))
+            play_tone(2000, 1000)
+        elif humNow > humhigh and tempNow > temphigh:
+            value = 'Temp:'+str(tempNow)+'C CRITICAL\nHum:'+str(humNow)+'%' + 'CRITICAL'
+            light.show_colour((255,0,0))
+            warningTone()
+        else:
+            value = "Error."
+            light.show_colour((255,128,0))
+            warningTone()
+
+        print(tempNow, humNow)
+        lcd.display(value)
+        time.sleep(0.5)
+except:
+    light.show_colour((0,0,0))
+    lcd.display(' '*16+'\n'+' '*16)
+    print('Code ended.')

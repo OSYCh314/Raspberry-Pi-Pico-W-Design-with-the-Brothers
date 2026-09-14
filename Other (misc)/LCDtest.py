@@ -86,6 +86,17 @@ class Screen:
 lcd = Screen()
 
 lcd.start()
-lcd.display('TESTING\nTESTING')
-time.sleep(10)
-lcd.display('Why James?\nHelp')
+
+try:
+    while True:
+        lcd.display('PID TESTING\nINFO IS FAKE')
+        time.sleep(2)
+        lcd.display("13:00 Emerson Pk\n13:30 Matt Junc")
+        time.sleep(5)
+        lcd.display("14:00 Emerson Pk\n14:15 Dnmk Hill")
+        time.sleep(5)
+        lcd.display("Report any sus Emersons\nTr Police@1718")
+        time.sleep(5)
+
+except:
+    lcd.display(' '*16+'\n'+' '*16)
