@@ -95,7 +95,7 @@ try:
         time.sleep(5)
         lcd.display("14:00 Emerson Pk\n14:15 Dnmk Hill")
         time.sleep(5)
-        lcd.display("Report any sus Emersons\nTr Police@1718")
+        lcd.display("Report any sus\nEmersons@1718")
         time.sleep(5)
 
 except:
