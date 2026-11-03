@@ -97,6 +97,10 @@ try:
         time.sleep(5)
         lcd.display("Report any sus\nEmersons@1718")
         time.sleep(5)
+        lcd.display("See it, say it,\nsorted.")
+        time.sleep(3)
+        lcd.display("British TP\ntext 61016")
+        time.sleep(3)
 
 except:
     lcd.display(' '*16+'\n'+' '*16)

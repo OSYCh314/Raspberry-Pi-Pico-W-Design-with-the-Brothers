@@ -20,7 +20,7 @@ def measureHum():
     except OSError as e:
         # Handle sensor reading failures (e.g., loose wires)
         print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
-
+        
         return 0
 
 def measureTemp():
@@ -172,7 +172,14 @@ def warningTone():
 
 lcd = Screen()
 light = rgb_led(18,19,20)
+flashlight = Pin(9)
 lcd.start()
+
+def flash():
+    flashlight.on()
+    time.sleep(0.5)
+    flashlight.off()
+
 
 try:
     while True:
@@ -196,6 +203,7 @@ try:
             value = 'Temp:'+str(tempNow)+'C\nHum:'+str(humNow)+'%' + ' CRITICAL'
             light.show_colour((255,0,0))
             warningTone()
+            flash()
         elif humNow < humlow and tempNow >= templow and tempNow <= temphigh:
             value = 'Temp:'+str(tempNow)+'C CAUTION\nHum:'+str(humNow)+'%'
             light.show_colour((255,255,0))
@@ -204,6 +212,7 @@ try:
             value = 'Temp:'+str(tempNow)+'C CRITICAL\nHum:'+str(humNow)+'%'
             light.show_colour((255,0,0))
             warningTone()
+            flash()
         elif humNow >= humlow and humNow <= humhigh and tempNow >= templow and tempNow <= temphigh:
             value = 'Temp:'+str(tempNow)+'C CAUTION\nHum:'+str(humNow)+'%' + ' CAUTION'
             light.show_colour((255,255,0))
@@ -212,10 +221,12 @@ try:
             value = 'Temp:'+str(tempNow)+'C CRITICAL\nHum:'+str(humNow)+'%' + 'CRITICAL'
             light.show_colour((255,0,0))
             warningTone()
+            flash()
         else:
             value = "Error."
             light.show_colour((255,128,0))
             warningTone()
+            flash()
 
         print(tempNow, humNow)
         lcd.display(value)
