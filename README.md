@@ -4,9 +4,9 @@ This is some code for a Raspberry Pi Pico W with:
 - Temperature and Humidity Sensor (DHT11)
 - At least 1 RGB LED
 - 3 buttons or a buzzer
-- A potentiometer
 
 Please note that the port numbers should be changed to be compatible.
+Modules for the LCD display and the RGB LEDs are attached.
 
 > [!important]
-> This code is licensed under an AS-IS basis. Nothing here is guaranteed to work. Remember to double check your circuit wiring, port numbers and products (e.g., you cannot be using Arduino code for an ESP32).
+> This code is licensed under an AS-IS basis. Nothing here is guaranteed to work. Remember to double check your circuit wiring, port numbers and products (e.g., you cannot be using Arduino code for an ESP32). Also, this project is a school project only.
