@@ -1,9 +1,10 @@
 from machine import Pin,PWM
 from time import sleep
+import time
 
 buzzer = PWM(Pin(16))
 buzzer.freq(1000)
-buzzer.duty_u16(32768)
+buzzer.duty_u16(65535)
 
 def play_notes(buzzer,notes,dur):
     for ii in range(len(notes)):
@@ -26,4 +27,9 @@ for x in notes:
 for y in notes:
     new_dur.append(y*1.25)
 
-play_notes(buzzer,new_notes,dur)
+try:
+    while True:
+        play_notes(buzzer,new_notes,dur)
+        time.sleep(1)
+except:
+    buzzer.duty_u16(0)
