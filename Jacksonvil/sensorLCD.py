@@ -1,51 +1,8 @@
-from machine import Pin, PWM
+from machine import Pin, PWM, I2C
 import dht
 import time
 
-# Initialize the DHT11 sensor
-sensor = dht.DHT11(Pin(15))
-buzzer_pin = Pin(16)
-buzzer = PWM(buzzer_pin)
-
-def measureHum():
-    try:
-        # Trigger a sensor measurement
-        sensor.measure()
-        
-        # Read the temperature and humidity values
-        hum = sensor.humidity()        # Returns relative humidity percentage
-
-        return int(hum)
-        
-    except OSError as e:
-        # Handle sensor reading failures (e.g., loose wires)
-        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
-        
-        return 0
-
-def measureTemp():
-    try:
-        # Trigger a sensor measurement
-        sensor.measure()
-        
-        # Read the temperature and humidity values
-        temp = sensor.temperature()    # Returns temperature in Celsius
-
-        return int(temp)
-        
-    except OSError as e:
-        # Handle sensor reading failures (e.g., loose wires)
-        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
-
-        return 0
-
-from machine import Pin, PWM, I2C
-import time
-
-# --- Hardware Configuration ---
-# Match the pins configured inside diagram.json
-import time
-from machine import I2C, Pin
+### MODULES START
 
 class Screen:
     def __init__(self, num=0, sda=0, scl=1, freq=400000):
@@ -124,19 +81,6 @@ class Screen:
         if line2:
             self.display_line(line2, 2)
 
-def play_tone(frequency, duration_ms):
-    if frequency == 0:
-        # Frequency of 0 means silence/rest
-        buzzer.duty_u16(0)
-    else:
-        buzzer.freq(frequency)     # Set the tone pitch
-        buzzer.duty_u16(32768)    # Set volume / 50% duty cycle
-        
-    time.sleep_ms(duration_ms)
-    buzzer.duty_u16(0)
-
-from machine import Pin, PWM
-
 class rgb_led:
   def __init__(self,pin_r=0,pin_g=1,pin_b=2,freq = 1000):
     self.r = PWM(Pin(pin_r))
@@ -160,6 +104,63 @@ class rgb_led:
     b_true = b*256
     self.b.duty_u16(b_true)
 
+    ### MODULES END
+
+
+
+# Variables initialisation
+sensor = dht.DHT11(Pin(15))
+buzzer_pin = Pin(16)
+buzzer = PWM(buzzer_pin)
+light = rgb_led(3,4,5)
+flashlight = Pin(22)
+
+
+def measureHum():
+    try:
+        # Trigger a sensor measurement
+        sensor.measure()
+        
+        # Read the temperature and humidity values
+        hum = sensor.humidity()        # Returns relative humidity percentage
+
+        return int(hum)
+        
+    except OSError as e:
+        # Handle sensor reading failures (e.g., loose wires)
+        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
+        
+        return 0
+
+def measureTemp():
+    try:
+        # Trigger a sensor measurement
+        sensor.measure()
+        
+        # Read the temperature and humidity values
+        temp = sensor.temperature()    # Returns temperature in Celsius
+
+        return int(temp)
+        
+    except OSError as e:
+        # Handle sensor reading failures (e.g., loose wires)
+        print(f"Failed to read data from the DHT11 sensor. This is because of {e}.")
+
+        return 0
+
+def play_tone(frequency, duration_ms):
+    if frequency == 0:
+        # Frequency of 0 means silence/rest
+        buzzer.duty_u16(0)
+    else:
+        buzzer.freq(frequency)     # Set the tone pitch
+        buzzer.duty_u16(32768)    # Set volume / 50% duty cycle
+        
+    time.sleep_ms(duration_ms)
+    buzzer.duty_u16(0)
+
+from machine import Pin, PWM
+
 NOTES = {
     'C5': 523,
     'E5': 659,
@@ -171,8 +172,6 @@ def warningTone():
         play_tone(ii*2 + 500,10)
 
 lcd = Screen()
-light = rgb_led(18,19,20)
-flashlight = Pin(9)
 lcd.start()
 
 def flash():
@@ -183,6 +182,7 @@ def flash():
 
 try:
     while True:
+        #Detects all situations and displays/beeps/flashes the apprpriate things.
         tempNow = measureTemp()
         humNow = measureHum()
 
@@ -192,7 +192,24 @@ try:
         templow = 25
         temphigh = 30
 
-        if humNow < humlow and tempNow < templow:
+        humstat = 0;
+        tempstat = 0;
+
+        if humNow < humlow:
+            humstat = 0;
+        elif humNow >= humlow and humNow <= humhigh:
+            humstat = 1;
+        elif humNow > humhigh:
+            humstat = 2;
+
+        if tempNow < temphigh:
+            tempstat = 0;
+        elif tempNow >= humlow and tempNow <= humhigh:
+            tempstat = 1;
+        elif humNow > humhigh:
+            humstat = 2;
+
+        if humstat == 0 and humstat == 0:
             value = 'Temp:'+str(tempNow)+'C\nHum:'+str(humNow)+'%'
             light.show_colour((0,255,0))
         elif humNow >= humlow and humNow <= humhigh and tempNow < templow:
